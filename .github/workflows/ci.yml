@@ -1,0 +1,35 @@
+name: CI for Github Pages
+
+on:
+  push:
+    branches: [ $default-branch ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+
+      - name: Build the SvelteKit app
+        run: pnpm build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          name: ${{ inputs.name }}
+          path: ${{ runner.temp }}/artifact.tar
+          retention-days: ${{ inputs.retention-days }}
+          if-no-files-found: error
